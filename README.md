@@ -196,8 +196,5 @@ Adicione o token JWT no cabeçalho de suas requisições para acessar rotas prot
 Authorization: Bearer seu_token_jwt
 ```
 
-## Contribuição
-
-Sinta-se à vontade para contribuir com o projeto! Se você encontrar algum bug ou tiver sugestões de melhorias, crie uma issue ou envie um pull request.
 
 
