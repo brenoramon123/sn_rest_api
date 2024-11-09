@@ -1,6 +1,7 @@
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+from datetime import timedelta
 
 
 
@@ -10,7 +11,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
+SIMPLE_JWT = {
+    'SIGNING_KEY': '8bafedb02e524d28b2fe04e88f424a3a092c0914ed12271083f1b98cc30baf8046',
+}
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -19,7 +22,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'fn_foods'
+    'fn_foods',
+    'rest_framework',
+
+
 ]
 
 MIDDLEWARE = [
@@ -105,3 +111,23 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',  # Permissão padrão para usuários autenticados
+    ],
+}
+
+# Configurações para o JWT (tempo de expiração e outros parâmetros)
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),  # Tempo de validade do token de acesso
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),  # Tempo de validade do token de refresh
+    'ROTATE_REFRESH_TOKENS': True,  # Gira o refresh token sempre que um novo é gerado
+    'BLACKLIST_AFTER_ROTATION': True,  # Marca o refresh token como inválido após a rotação
+    'ALGORITHM': 'HS256',  # Algoritmo de assinatura do JWT
+    'SIGNING_KEY': '8bafedb02e524d28b2fe04e88f424a3a092c0914ed12271083f1b98cc30baf8046',  # Chave secreta para assinatura do JWT (não compartilhe)
+    'AUTH_HEADER_TYPES': ('Bearer',),  # Tipo do cabeçalho de autorização
+}
