@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
 from typing import Optional
 from django.http.response import HttpResponse
+from .models import ItensPedido,Pedido
 
 
 class UsuarioSchemaIn(BaseModel):
@@ -88,3 +89,120 @@ class SignupSchema(BaseModel):
     username: str
     password: str = Field(..., min_length=6)
     email:str    
+
+class ItensPedidoSchemaIn(BaseModel):
+    pedido_id: int
+    nome: str
+    descricao: Optional[str] = None
+    quantidade: int = Field(..., gt=0)  # Quantidade deve ser maior que 0
+    preco: float = Field(..., gt=0)   # Preço deve ser maior que 0
+    categoria: str = Field(..., pattern="^(bebida|sobremesa|salada|acompanhamento)$")
+
+    class Config:
+        from_attributes = True
+
+    def create_item_pedido(self) -> ItensPedido:
+        return ItensPedido.objects.create(**self.dict())
+
+class ItensPedidoSchemaOut(BaseModel):
+    id: int
+    pedido_id: int
+    nome: str
+    descricao: Optional[str]
+    quantidade: int
+    preco: float
+    categoria: str
+
+    class Config:
+        from_attributes = True
+
+    @classmethod
+    def from_orm(cls, item: ItensPedido):
+        return cls(
+            id=item.id,
+            pedido_id=item.pedido_id.id,
+            nome=item.nome,
+            descricao=item.descricao,
+            quantidade=item.quantidade,
+            preco=item.preco,
+            categoria=item.categoria,
+        )
+
+class ItensPedidoSchemaUpdate(BaseModel):
+    nome: Optional[str] = None
+    descricao: Optional[str] = None
+    quantidade: Optional[int] = Field(None, gt=0)
+    preco: Optional[float] = Field(None, gt=0)
+    categoria: Optional[str] = Field(None, pattern="^(bebida|sobremesa|salada|acompanhamento)$")
+
+    class Config:
+        from_attributes = True
+
+    def update_item_pedido(self, item: ItensPedido) -> ItensPedido:
+        for attr, value in self.dict(exclude_unset=True).items():
+            setattr(item, attr, value)
+        item.save()
+        return item
+    
+class PedidoSchemaIn(BaseModel):
+    total: float
+    status: str = Field(default="pendente")
+    usuario_id: int
+
+    class Config:
+        from_attributes = True
+
+    def create_pedido(self) -> Pedido:
+        try:
+            # Buscando a instância do usuário correspondente ao ID fornecido
+            usuario = User.objects.get(id=self.usuario_id)
+        except User.DoesNotExist:
+            raise HttpResponse(f"Usuário com id {self.usuario_id} não encontrado", status=400)
+        
+        # Agora criamos o pedido com a instância do usuário
+        return Pedido.objects.create(
+            total=self.total,
+            status=self.status,
+            usuario_id=usuario  # Atribuindo a instância de usuário
+        )
+
+
+
+class PedidoSchemaOut(BaseModel):
+    id: int
+    total: float
+    status: str
+    data_pedido: str
+    usuario_id: int
+
+    class Config:
+        from_attributes = True
+
+    @classmethod
+    def from_orm(cls, pedido: Pedido):
+        return cls(
+            id=pedido.id,
+            total=pedido.total,
+            status=pedido.status,
+            data_pedido=pedido.data_pedido.isoformat(),  # ISO 8601 format
+            usuario_id=pedido.usuario_id.id
+        )
+
+
+class PedidoSchemaUpdate(BaseModel):
+    total: Optional[float] = None
+    status: Optional[str] = None
+    usuario_id: Optional[int] = None
+
+    class Config:
+        from_attributes = True
+
+    def update_pedido(self, pedido: Pedido) -> Pedido:
+        if self.total:
+            pedido.total = self.total
+        if self.status:
+            pedido.status = self.status
+        if self.usuario_id:
+            pedido.usuario_id = self.usuario_id
+        pedido.save()
+        return pedido
