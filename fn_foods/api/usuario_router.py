@@ -4,7 +4,7 @@ from django.contrib.auth.models import User as Usuario
 from django.contrib.auth.hashers import make_password
 from django.http import JsonResponse
 from ninja.errors import HttpError
-from .auth import JWTAuth
+from ..services.auth import JWTAuth
 
 
 usuario_router = Router(auth=JWTAuth())
