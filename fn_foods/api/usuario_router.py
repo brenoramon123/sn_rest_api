@@ -1,14 +1,10 @@
 from ninja import Router
-from ..schemas import UsuarioSchemaIn, UsuarioSchemaOut,SignupSchema, UsuarioSchemaUpdate,LoginSchema
+from ..schemas import UsuarioSchemaIn, UsuarioSchemaOut,SignupSchema, UsuarioSchemaUpdate
 from django.contrib.auth.models import User as Usuario
 from django.contrib.auth.hashers import make_password
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
 from ninja.errors import HttpError
-from django.http.response import HttpResponse
 from .auth import JWTAuth
-
-
 
 
 usuario_router = Router(auth=JWTAuth())
@@ -29,23 +25,20 @@ def listar_usuarios(request):
 def obter_usuario(request, usuario_id: int):
     return Usuario.objects.get(id=usuario_id)
 
-@usuario_router.put("/{usuario_id}", response=UsuarioSchemaOut)
+@usuario_router.put("/{usuario_id}/", response=UsuarioSchemaOut)
 def atualizar_usuario(request, usuario_id: int, dados: UsuarioSchemaUpdate):
+    
     try:
         usuario = Usuario.objects.get(id=usuario_id)
     except Usuario.DoesNotExist:
         raise HttpError(status_code=404, message="Usuário não encontrado")
-
-    if usuario.id != request.user.id:
-        raise HttpError(status_code=403, message="Você não tem permissão para editar este usuário.")
     
     for attr, value in dados.model_dump().items():
-        if attr == "password" and value: 
+        if attr == "password" and value:
             value = make_password(value)
         setattr(usuario, attr, value)
-    
-    usuario.save()
 
+    usuario.save()
     return UsuarioSchemaOut.from_orm(usuario)
 
 @usuario_router.delete("/{usuario_id}")
