@@ -7,8 +7,11 @@ itens_pedido_router = Router()
 
 @itens_pedido_router.post("/", response=ItensPedidoSchemaOut)
 def criar_item_pedido(request, dados: ItensPedidoSchemaIn):
-    item = dados.create_item_pedido()
-    return ItensPedidoSchemaOut.from_orm(item)
+    try:
+        item = dados.create_item_pedido()
+        return ItensPedidoSchemaOut.from_orm(item)
+    except HttpError as e:
+        raise 
 
 @itens_pedido_router.get("/", response=list[ItensPedidoSchemaOut])
 def listar_itens_pedido(request):

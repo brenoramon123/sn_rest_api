@@ -102,7 +102,22 @@ class ItensPedidoSchemaIn(BaseModel):
         from_attributes = True
 
     def create_item_pedido(self) -> ItensPedido:
-        return ItensPedido.objects.create(**self.dict())
+        # Buscar a instância do Pedido pelo ID
+        try:
+            pedido = Pedido.objects.get(id=self.pedido_id)  # Obtém o pedido pela chave estrangeira
+        except Pedido.DoesNotExist:
+            raise HttpError(status_code=404, message="Pedido não encontrado")
+
+        # Criar o item de pedido com a instância do Pedido
+        return ItensPedido.objects.create(
+            pedido_id=pedido,  # Atribuir a instância de Pedido
+            nome=self.nome,
+            descricao=self.descricao,
+            quantidade=self.quantidade,
+            preco=self.preco,
+            categoria=self.categoria
+        )
+
 
 class ItensPedidoSchemaOut(BaseModel):
     id: int
