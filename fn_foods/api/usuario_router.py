@@ -1,17 +1,17 @@
 from ninja import Router
 from ..schemas import UsuarioSchemaIn, UsuarioSchemaOut,SignupSchema, UsuarioSchemaUpdate,LoginSchema
 from django.contrib.auth.models import User as Usuario
-
 from django.contrib.auth.hashers import make_password
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from ninja.errors import HttpError
 from django.http.response import HttpResponse
+from .auth import JWTAuth
 
 
 
 
-usuario_router = Router()
+usuario_router = Router(auth=JWTAuth())
 
 @usuario_router.post("/signup", response=SignupSchema)
 def criar_usuario(request, dados: SignupSchema):
