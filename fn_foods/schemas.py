@@ -4,7 +4,8 @@ from django.contrib.auth.hashers import make_password
 from typing import Optional
 from django.http.response import HttpResponse
 from .models import ItensPedido,Pedido
-
+from typing import List
+from ninja.errors import HttpError
 
 class UsuarioSchemaIn(BaseModel):
     id: Optional[int] = None 
@@ -61,7 +62,7 @@ class PedidoSchema(BaseModel):
     usuario_id: int
 
     class Config:
-        from_attributes = True  # Permite que o modelo converta instâncias ORM
+        from_attributes = True 
 
 class UsuarioSchemaUpdate(BaseModel):
     username: Optional[str] = None
@@ -94,23 +95,22 @@ class ItensPedidoSchemaIn(BaseModel):
     pedido_id: int
     nome: str
     descricao: Optional[str] = None
-    quantidade: int = Field(..., gt=0)  # Quantidade deve ser maior que 0
-    preco: float = Field(..., gt=0)   # Preço deve ser maior que 0
+    quantidade: int = Field(..., gt=0) 
+    preco: float = Field(..., gt=0)  
     categoria: str = Field(..., pattern="^(bebida|sobremesa|salada|acompanhamento)$")
 
     class Config:
         from_attributes = True
 
     def create_item_pedido(self) -> ItensPedido:
-        # Buscar a instância do Pedido pelo ID
+        
         try:
-            pedido = Pedido.objects.get(id=self.pedido_id)  # Obtém o pedido pela chave estrangeira
+            pedido = Pedido.objects.get(id=self.pedido_id)  
         except Pedido.DoesNotExist:
             raise HttpError(status_code=404, message="Pedido não encontrado")
 
-        # Criar o item de pedido com a instância do Pedido
         return ItensPedido.objects.create(
-            pedido_id=pedido,  # Atribuir a instância de Pedido
+            pedido_id=pedido, 
             nome=self.nome,
             descricao=self.descricao,
             quantidade=self.quantidade,
@@ -169,16 +169,14 @@ class PedidoSchemaIn(BaseModel):
 
     def create_pedido(self) -> Pedido:
         try:
-            # Buscando a instância do usuário correspondente ao ID fornecido
             usuario = User.objects.get(id=self.usuario_id)
         except User.DoesNotExist:
             raise HttpResponse(f"Usuário com id {self.usuario_id} não encontrado", status=400)
         
-        # Agora criamos o pedido com a instância do usuário
         return Pedido.objects.create(
             total=self.total,
             status=self.status,
-            usuario_id=usuario  # Atribuindo a instância de usuário
+            usuario_id=usuario 
         )
 
 
@@ -199,7 +197,7 @@ class PedidoSchemaOut(BaseModel):
             id=pedido.id,
             total=pedido.total,
             status=pedido.status,
-            data_pedido=pedido.data_pedido.isoformat(),  # ISO 8601 format
+            data_pedido=pedido.data_pedido.isoformat(), 
             usuario_id=pedido.usuario_id.id
         )
 
@@ -221,3 +219,17 @@ class PedidoSchemaUpdate(BaseModel):
             pedido.usuario_id = self.usuario_id
         pedido.save()
         return pedido
+    
+class ItensPedidoPaginatedResponseSchema(BaseModel):
+    items: List[ItensPedidoSchemaOut]
+    total_pages: int
+    current_page: int
+    has_next: bool
+    has_previous: bool
+
+class PedidoPaginatedResponseSchema(BaseModel):
+    items: List[PedidoSchemaOut]
+    total_pages: int
+    current_page: int
+    has_next: bool
+    has_previous: bool

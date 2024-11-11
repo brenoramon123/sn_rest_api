@@ -1,6 +1,5 @@
 from ninja import Router
-from ..models import Pedido
-from ..schemas import PedidoSchema,SignupSchema
+from ..schemas import SignupSchema
 from django.contrib.auth.models import User as Usuario
 from ninja.errors import HttpError
 from django.http import JsonResponse

@@ -121,13 +121,12 @@ REST_FRAMEWORK = {
     ],
 }
 
-# Configurações para o JWT (tempo de expiração e outros parâmetros)
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),  # Tempo de validade do token de acesso
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),  # Tempo de validade do token de refresh
-    'ROTATE_REFRESH_TOKENS': True,  # Gira o refresh token sempre que um novo é gerado
-    'BLACKLIST_AFTER_ROTATION': True,  # Marca o refresh token como inválido após a rotação
-    'ALGORITHM': 'HS256',  # Algoritmo de assinatura do JWT
-    'SIGNING_KEY': '8bafedb02e524d28b2fe04e88f424a3a092c0914ed12271083f1b98cc30baf8046',  # Chave secreta para assinatura do JWT (não compartilhe)
-    'AUTH_HEADER_TYPES': ('Bearer',),  # Tipo do cabeçalho de autorização
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),  
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1), 
+    'ROTATE_REFRESH_TOKENS': True,  
+    'BLACKLIST_AFTER_ROTATION': True, 
+    'ALGORITHM': 'HS256', 
+    'SIGNING_KEY': '8bafedb02e524d28b2fe04e88f424a3a092c0914ed12271083f1b98cc30baf8046',  
+    'AUTH_HEADER_TYPES': ('Bearer',),
 }
