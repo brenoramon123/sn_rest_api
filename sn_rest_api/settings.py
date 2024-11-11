@@ -73,6 +73,7 @@ DATABASES = {
     }
 }
 
+#SE FOR UM BANCO LOCAL UTILIZE AS CONFIGS ABAIXO 
 
 # DATABASES = {
 #     'default': {
@@ -80,7 +81,7 @@ DATABASES = {
 #         'NAME': 'sn_foods',
 #         'USER': 'root',  # Ajuste para o nome de usuário do MySQL
 #         'PASSWORD': 'root',  # Senha do usuário
-#         'HOST': 'localhost',  # Nome do serviço no Docker
+#         'HOST': 'localhost', 
 #         'PORT': '3306',
 #     }
 # }
