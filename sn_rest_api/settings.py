@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'fn_foods',
     'rest_framework',
+    'django_extensions',
 
 
 ]
@@ -65,14 +66,24 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'sn_foods',
-        'USER': 'root',
-        'PASSWORD': 'root',
-        'HOST': 'localhost', 
+        'USER': 'root',  # Ajuste para o nome de usuário do MySQL
+        'PASSWORD': 'root',  # Senha do usuário
+        'HOST': 'db',  # Nome do serviço no Docker
         'PORT': '3306',
     }
 }
 
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'sn_foods',
+#         'USER': 'root',  # Ajuste para o nome de usuário do MySQL
+#         'PASSWORD': 'root',  # Senha do usuário
+#         'HOST': 'localhost',  # Nome do serviço no Docker
+#         'PORT': '3306',
+#     }
+# }
 
 AUTH_PASSWORD_VALIDATORS = [
     {
